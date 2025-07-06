@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: core
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  generators:
+    - matrix:
+        generators:
+          - git:
+              repoURL: https://github.com/labs-home/gitops-core
+              revision: HEAD
+              files:
+                - path: service*config.json
+              pathParamPrefix: app
+  template:
+    metadata:
+      name: 'core-{{serviceName}}'
+      namespace: argocd
+      annotations:
+        argocd.argoproj.io/sync-wave: "0"
+    spec:
+      project: core
+      sources:
+        - repoURL: '{{serviceRepoUrl}}'
+          targetRevision: '{{serviceTargetRevision}}'
+          path: '{{serviceManifestPath}}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{serviceNamespace}}'
+      syncPolicy:
+        automated: {}
+        syncOptions:
+          - ServerSideApply=true
+          - CreateNamespace=true

@@ -1,0 +1,7 @@
+{
+    "serviceName": "metallb",
+    "serviceNamespace": "metallb-system",
+    "serviceRepoUrl": "https://github.com/labs-home/gitops-core",
+    "serviceTargetRevision": "HEAD",
+    "serviceManifestPath": "argocd/applications/metallb"
+}
