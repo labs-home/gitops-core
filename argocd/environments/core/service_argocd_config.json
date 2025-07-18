@@ -1,7 +1,0 @@
-{
-    "serviceName": "argocd",
-    "serviceNamespace": "argocd",
-    "serviceRepoUrl": "https://github.com/labs-home/gitops-core",
-    "serviceTargetRevision": "HEAD",
-    "serviceManifestPath": "argocd/applications/argocd"
-}
