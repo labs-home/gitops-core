@@ -4,7 +4,7 @@ metadata:
   name: apps
   namespace: argocd
 spec:
-  project: common
+  project: default
   source:
     repoURL: 'https://github.com/labs-home/gitops-core'
     targetRevision: HEAD
