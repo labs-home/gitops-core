@@ -7,15 +7,17 @@ spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
   generators:
-  - git:
-      repoURL: 'git@github.com:labs-home/gitops-core.git'
-      revision: HEAD
-      directories:
-      - path: applications/*/envs/services
-  - clusters:
-      selector:
-        matchLabels:
-          environment: services
+  - matrix:
+      generators:
+        - git:
+            repoURL: 'git@github.com:labs-home/gitops-core.git'
+            revision: HEAD
+            directories:
+            - path: applications/*/envs/services
+        - clusters:
+            selector:
+              matchLabels:
+                environment: "services"
   template:
     metadata:
       name: '{{index .path.segments 1}}-{{.name}}'
