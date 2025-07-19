@@ -7,13 +7,11 @@ spec:
   goTemplate: true
   goTemplateOptions: ["missingkey=error"]
   generators:
-  - matrix:
-      generators:
-        - git:
-            repoURL: 'git@github.com:labs-home/gitops-core.git'
-            revision: HEAD
-            directories:
-            - path: applications/*/envs/common
+  - git:
+      repoURL: 'git@github.com:labs-home/gitops-core.git'
+      revision: HEAD
+      directories:
+      - path: applications/*/envs/common
   template:
     metadata:
       name: '{{index .path.segments 1}}-{{.name}}'
