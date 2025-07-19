@@ -8,7 +8,7 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
   - git:
-      repoURL: 'https://github.com/labs-home/gitops-core'
+      repoURL: 'git@github.com:labs-home/gitops-core.git'
       revision: HEAD
       directories:
       - path: applications/*/envs/common
@@ -18,7 +18,7 @@ spec:
     spec:
       project: common
       source:
-        repoURL: 'https://github.com/labs-home/gitops-core'
+        repoURL: 'git@github.com:labs-home/gitops-core.git'
         targetRevision: HEAD
         path: '{{.path.path}}'
       destination:
