@@ -1,10 +1,4 @@
 apiVersion: argoproj.io/v1alpha1
-kind: Project
-metadata:
-  name: common
-  namespace: argocd
----
-apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: apps
