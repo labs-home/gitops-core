@@ -1,14 +1,20 @@
 apiVersion: argoproj.io/v1alpha1
+kind: Project
+metadata:
+  name: common
+  namespace: argocd
+---
+apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: core-apps
+  name: apps
   namespace: argocd
 spec:
-  project: core
+  project: common
   source:
     repoURL: 'https://github.com/labs-home/gitops-core'
     targetRevision: HEAD
-    path: appsets/appset_core.yml
+    path: appsets
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argocd

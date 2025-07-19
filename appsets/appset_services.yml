@@ -12,6 +12,10 @@ spec:
       revision: HEAD
       directories:
       - path: applications/*/envs/services
+  - clusters:
+      selector:
+        matchLabels:
+          environment: services
   template:
     metadata:
       name: '{{index .path.segments 1}}-{{index .path.segments 3}}'
