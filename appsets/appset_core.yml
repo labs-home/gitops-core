@@ -18,7 +18,7 @@ spec:
           environment: core
   template:
     metadata:
-      name: '{{index .path.segments 1}}-{{index .path.segments 3}}'
+      name: '{{index .path.segments 1}}-{{.name}}'
     spec:
       project: default
       source:
@@ -27,7 +27,7 @@ spec:
         path: '{{.path.path}}'
       destination:
         server: 'https://kubernetes.default.svc'
-        namespace: '{{index .path.segments 1}}-{{index .path.segments 3}}'
+        namespace: '{{index .path.segments 1}}'
       syncPolicy:
         syncOptions:
           - CreateNamespace=true
