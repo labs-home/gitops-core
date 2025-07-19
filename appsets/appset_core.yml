@@ -20,7 +20,7 @@ spec:
     metadata:
       name: '{{index .path.segments 1}}-{{index .path.segments 3}}'
     spec:
-      project: core
+      project: default
       source:
         repoURL: 'git@github.com:labs-home/gitops-core.git'
         targetRevision: HEAD
