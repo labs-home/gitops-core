@@ -58,12 +58,27 @@ k3s_install() {
                     echo "K3s installed successfully with custom settings."
                     echo "You can now use 'k3s kubectl' to interact with your K3s cluster."
 
-                    # Copy kubeconfig to the user's home directory
+                    # Copy K3s token to a file
+                    echo $K3S_TOKEN > /home/$SUDO_USER/k3s_token
+                    echo "K3s token saved to /home/$SUDO_USER/k3s_token"
+
+                    # Copy kubeconfig to the root and user's home directory
                     if [ -f /etc/rancher/k3s/k3s.yaml ]; then
+                        # Copy kubeconfig to root's home directory
                         mkdir -p $HOME/.kube
                         sudo cp /etc/rancher/k3s/k3s.yaml $HOME/.kube/config
                         sudo chown $(id -u):$(id -g) $HOME/.kube/config
                         echo "Kubeconfig copied to $HOME/.kube/config"
+
+                        # Copy kubeconfig to user's home directory
+                        if [ -d /home/$SUDO_USER ]; then
+                            sudo mkdir -p /home/$SUDO_USER/.kube
+                            sudo cp /etc/rancher/k3s/k3s.yaml /home/$SUDO_USER/.kube/config
+                            sudo chown $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube/config
+                            echo "Kubeconfig copied to /home/$SUDO_USER/.kube/config"
+                        else
+                            echo "User home directory /home/$SUDO_USER does not exist. Skipping kubeconfig copy."
+                        fi
                     else
                         echo "Kubeconfig file not found. Please check the K3s installation."
                         exit 1
@@ -140,6 +155,9 @@ argocd_k8s_provision() {
     # Check if ArgoCD was installed successfully
     if kubectl get pods -n argocd &> /dev/null; then
         echo "ArgoCD provisioned successfully."
+
+        # Ask the user if they want to add this repository to ArgoCD
+        # Coming soon when the repository is publicly available
     else
         echo "Failed to provision ArgoCD."
         exit 1
@@ -273,7 +291,7 @@ echo """
              @@@@@@@@@@@@@@@@@@@@@@@@@             
                @@@@@@@@@@@@@@@@@@@@@               
 """
-echo "Welcome to the K8s Bootstrap Script"
+echo "Welcome to the K8s Bootstrap Script $SUDO_USER!"
 options=("Install K3s", "Provision ArgoCD onto Cluster", "Install ArgoCD CLI", "Install K9s", "Exit")
 PS3="Please select an option: "
 select opt in "${options[@]}"; do
