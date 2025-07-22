@@ -178,11 +178,8 @@ argocd_k8s_provision() {
     # Check if kustomize is installed
     if ! command -v kustomize &> /dev/null; then
         echo "Kustomize is not installed. Installing Kustomize..."
-        KUSTOMIZE_LATEST_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | grep -oP "tag_name\": \"\K[^\"]+")
-        curl -sSL -o kustomize_linux_amd64.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_LATEST_VERSION}/kustomize_${KUSTOMIZE_LATEST_VERSION}_linux_amd64.tar.gz
-        tar -xzf kustomize_linux_amd64.tar.gz
-        sudo mv kustomize /usr/local/bin/
-        rm kustomize_linux_amd64.tar.gz
+        # Install Kustomize using the official installation script
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
     fi
 
     # Add the gitops-core repository to ArgoCD
