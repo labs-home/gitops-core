@@ -10,7 +10,7 @@ spec:
   - matrix:
       generators:
         - git:
-            repoURL: 'git@github.com:labs-home/gitops-core.git'
+            repoURL: https://github.com/labs-home/gitops-core.git
             revision: HEAD
             directories:
             - path: applications/*/envs/services
@@ -24,7 +24,7 @@ spec:
     spec:
       project: default
       source:
-        repoURL: 'git@github.com:labs-home/gitops-core.git'
+        repoURL: https://github.com/labs-home/gitops-core.git
         targetRevision: HEAD
         path: '{{.path.path}}'
       destination:
