@@ -172,8 +172,18 @@ argocd_k8s_provision() {
 
     # Install ArgoCD using Helm
     echo "Installing ArgoCD..."
-    # Create namespace for ArgoCD
-    kubectl create namespace argocd
+    # Create namespace for ArgoCD if it doesn't exist
+    if ! kubectl get namespace argocd &> /dev/null; then
+        kubectl create namespace argocd
+        if [ $? -eq 0 ]; then
+            echo "Namespace 'argocd' created successfully."
+        else
+            echo "Failed to create namespace 'argocd'."
+            exit 1
+        fi
+    else
+        echo "Namespace 'argocd' already exists."
+    fi
     # Install ArgoCD using repository configuration
     # Check if kustomize is installed
     if ! command -v kustomize &> /dev/null; then

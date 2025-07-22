@@ -7,7 +7,11 @@ resources:
   - https://raw.githubusercontent.com/labs-home/gitops-core/refs/heads/master/apps/root_app.yml
 
 patches:
-  - argocd-cm.yaml
+- target:
+    version: v1
+    kind: ConfigMap
+    name: argocd-cm
+  path: argocd-cm.yaml
 
 helmCharts:
   - name: argo-cd
