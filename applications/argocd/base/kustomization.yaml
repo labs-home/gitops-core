@@ -5,7 +5,7 @@ namespace: argocd
 resources:
   - ns.yaml
   - repo.yaml
-  - root_app.yml
+  - root_app.yaml
 
 patches:
 - target:
