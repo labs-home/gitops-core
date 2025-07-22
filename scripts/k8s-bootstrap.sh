@@ -85,30 +85,35 @@ k3s_install() {
                     fi
 
                     # Install Cilium CNI
-                    echo "Installing Cilium CNI..."
-                    CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
-                    CLI_ARCH=amd64
-                    if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
-                    curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
-                    sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
-                    sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
-                    rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
-                    # Check if Cilium CLI was installed successfully
+                    # Check if Cilium CLI is already installed
                     if command -v cilium &> /dev/null; then
-                        echo "Cilium CNI installed successfully."
-
-                        # Install Cilium CNI in the K3s cluster
-                        LATEST_STABLE_CILIUM_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium/main/stable.txt)
-                        LATEST_STABLE_CILIUM_VERSION=${LATEST_STABLE_CILIUM_VERSION#v}
-                        cilium install --version ${LATEST_STABLE_CILIUM_VERSION}
-                        if [[ $? -eq 0 ]]; then
-                            echo "Cilium CNI installed successfully in the K3s cluster."
+                        echo "Cilium CNI is already installed."
+                    else
+                        echo "Installing Cilium CLI..."
+                        CILIUM_CLI_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium-cli/main/stable.txt)
+                        CLI_ARCH=amd64
+                        if [ "$(uname -m)" = "aarch64" ]; then CLI_ARCH=arm64; fi
+                        curl -L --fail --remote-name-all https://github.com/cilium/cilium-cli/releases/download/${CILIUM_CLI_VERSION}/cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+                        sha256sum --check cilium-linux-${CLI_ARCH}.tar.gz.sha256sum
+                        sudo tar xzvfC cilium-linux-${CLI_ARCH}.tar.gz /usr/local/bin
+                        rm cilium-linux-${CLI_ARCH}.tar.gz{,.sha256sum}
+                        # Check if Cilium CLI was installed successfully
+                        if command -v cilium &> /dev/null; then
+                            echo "Cilium CNI installed successfully."
                         else
-                            echo "Failed to install Cilium CNI in the K3s cluster."
+                            echo "Failed to install Cilium CLI."
                             exit 1
                         fi
+                    fi
+
+                    # Install Cilium CNI in the K3s cluster
+                    LATEST_STABLE_CILIUM_VERSION=$(curl -s https://raw.githubusercontent.com/cilium/cilium/main/stable.txt)
+                    LATEST_STABLE_CILIUM_VERSION=${LATEST_STABLE_CILIUM_VERSION#v}
+                    cilium install --version ${LATEST_STABLE_CILIUM_VERSION}
+                    if [[ $? -eq 0 ]]; then
+                        echo "Cilium CNI installed successfully in the K3s cluster."
                     else
-                        echo "Failed to install Cilium CNI."
+                        echo "Failed to install Cilium CNI in the K3s cluster."
                         exit 1
                     fi
 
@@ -148,13 +153,44 @@ argocd_k8s_provision() {
         exit 1
     fi
 
-    # Install ArgoCD using kubectl
+    # Check if Helm is installed
+    if ! command -v helm &> /dev/null; then
+        echo "Helm is not installed. Installing Helm..."
+        # Install Helm using the official installation script
+        curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+        chmod 700 get_helm.sh
+        ./get_helm.sh
+        rm get_helm.sh
+        # Check if Helm was installed successfully
+        if command -v helm &> /dev/null; then
+            echo "Helm installed successfully."
+        else
+            echo "Failed to install Helm."
+            exit 1
+        fi
+    fi
+
+    # Install ArgoCD using Helm
+    echo "Installing ArgoCD using Helm..."
+    helm repo add argo https://argoproj.github.io/argo-helm
+    helm repo update
+    # Create namespace for ArgoCD
     kubectl create namespace argocd
-    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+    # Install ArgoCD in the argocd namespace with custom values
+    helm install argocd argo/argo-cd --namespace argocd
+    # Check if the installation was successful
+    if [ $? -ne 0 ]; then
+        echo "Failed to install ArgoCD using Helm."
+        exit 1
+    fi
 
     # Check if ArgoCD was installed successfully
     if kubectl get pods -n argocd &> /dev/null; then
         echo "ArgoCD provisioned successfully."
+
+        # Enable Kustomize Helm support
+        echo "Enabling Kustomize Helm support..."
+        kubectl patch configmap -n argocd argocd-cm --type merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
 
         # Ask the user if they want to add this repository to ArgoCD
         # Coming soon when the repository is publicly available
