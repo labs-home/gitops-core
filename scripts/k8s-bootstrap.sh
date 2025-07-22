@@ -195,7 +195,7 @@ argocd_k8s_provision() {
 
     # Add the gitops-core repository to ArgoCD
     echo "Adding gitops-core repository to ArgoCD..."
-    kustomize build ../applications/argocd/base | kubectl apply -f -
+    kustomize build ../applications/argocd/base --enable-helm | kubectl apply -f -
     if [ $? -eq 0 ]; then
         echo "gitops-core repository added to ArgoCD successfully."
     fi
