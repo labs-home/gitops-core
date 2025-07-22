@@ -8,8 +8,8 @@ resources:
 
 helmCharts:
   - name: argocd
-    repo: oci://ghcr.io/argoproj/argo-helm
+    repo: https://argoproj.github.io/argo-helm
     version: 8.1.2
-    releaseName: argocd
+    releaseName: argo/argocd
     namespace: argocd
     includeCRDs: true
