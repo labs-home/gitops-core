@@ -13,5 +13,3 @@ helmCharts:
     releaseName: argocd
     namespace: argocd
     includeCRDs: true
-    valuesInline:
-      configs.cm.kustomize.buildOptions: "--enable-helm"
