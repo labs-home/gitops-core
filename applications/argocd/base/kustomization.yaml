@@ -4,7 +4,8 @@ kind: Kustomization
 namespace: argocd
 resources:
   - ns.yaml
-  - https://raw.githubusercontent.com/labs-home/gitops-core/refs/heads/master/apps/root_app.yml
+  - repo.yaml
+  - root_app.yml
 
 patches:
 - target:
