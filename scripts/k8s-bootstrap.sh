@@ -180,6 +180,7 @@ argocd_k8s_provision() {
         echo "Kustomize is not installed. Installing Kustomize..."
         # Install Kustomize using the official installation script
         curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash
+        mv kustomize /usr/local/bin/
     fi
 
     # Add the gitops-core repository to ArgoCD
