@@ -4,9 +4,9 @@ kind: Kustomization
 namespace: argocd
 resources:
   - ns.yaml
-  - ../../../apps/root_app.yml
+  - https://raw.githubusercontent.com/labs-home/gitops-core/refs/heads/master/apps/root_app.yml
 
-patchesStrategicMerge:
+patches:
   - argocd-cm.yaml
 
 helmCharts:
