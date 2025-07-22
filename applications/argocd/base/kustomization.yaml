@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: argocd
 resources:
   - ns.yaml
+  - ../../../apps/root_app.yml
 
 patchesStrategicMerge:
   - argocd-cm.yaml

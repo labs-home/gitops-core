@@ -171,29 +171,30 @@ argocd_k8s_provision() {
     fi
 
     # Install ArgoCD using Helm
-    echo "Installing ArgoCD using Helm..."
-    helm repo add argo https://argoproj.github.io/argo-helm
-    helm repo update
+    echo "Installing ArgoCD..."
     # Create namespace for ArgoCD
     kubectl create namespace argocd
-    # Install ArgoCD in the argocd namespace with custom values
-    helm install argocd argo/argo-cd --namespace argocd
-    # Check if the installation was successful
-    if [ $? -ne 0 ]; then
-        echo "Failed to install ArgoCD using Helm."
-        exit 1
+    # Install ArgoCD using repository configuration
+    # Check if kustomize is installed
+    if ! command -v kustomize &> /dev/null; then
+        echo "Kustomize is not installed. Installing Kustomize..."
+        KUSTOMIZE_LATEST_VERSION=$(curl -s https://api.github.com/repos/kubernetes-sigs/kustomize/releases/latest | grep -oP "tag_name\": \"\K[^\"]+")
+        curl -sSL -o kustomize_linux_amd64.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2F${KUSTOMIZE_LATEST_VERSION}/kustomize_${KUSTOMIZE_LATEST_VERSION}_linux_amd64.tar.gz
+        tar -xzf kustomize_linux_amd64.tar.gz
+        sudo mv kustomize /usr/local/bin/
+        rm kustomize_linux_amd64.tar.gz
+    fi
+
+    # Add the gitops-core repository to ArgoCD
+    echo "Adding gitops-core repository to ArgoCD..."
+    kustomize build ../applications/argocd/base | kubectl apply -f -
+    if [ $? -eq 0 ]; then
+        echo "gitops-core repository added to ArgoCD successfully."
     fi
 
     # Check if ArgoCD was installed successfully
     if kubectl get pods -n argocd &> /dev/null; then
         echo "ArgoCD provisioned successfully."
-
-        # Enable Kustomize Helm support
-        echo "Enabling Kustomize Helm support..."
-        kubectl patch configmap -n argocd argocd-cm --type merge -p '{"data":{"kustomize.buildOptions":"--enable-helm"}}'
-
-        # Ask the user if they want to add this repository to ArgoCD
-        # Coming soon when the repository is publicly available
     else
         echo "Failed to provision ArgoCD."
         exit 1
