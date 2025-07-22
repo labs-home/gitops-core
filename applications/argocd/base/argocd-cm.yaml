@@ -4,4 +4,5 @@ metadata:
   name: argocd-cm
   namespace: argocd
 data:
+  exec.enabled: "true"
   kustomize.buildOptions: "--enable-helm"
