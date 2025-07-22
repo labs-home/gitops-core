@@ -7,9 +7,8 @@ resources:
   - argocd-cm.yaml
 
 helmCharts:
-  - name: argocd
+  - name: argo-cd
     repo: https://argoproj.github.io/argo-helm
     version: 8.2.0
-    releaseName: argo-cd
     namespace: argocd
     includeCRDs: true
